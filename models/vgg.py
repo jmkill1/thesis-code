@@ -12,11 +12,14 @@ cfg = {
 
 
 class VGG(nn.Module):
-    def __init__(self, vgg_name):
+    def __init__(self, vgg_name, args):
         super(VGG, self).__init__()
         self.features = self._make_layers(cfg[vgg_name])
         self.classifier = nn.Linear(512, 10)
-
+        if args.baseset == 'FashionMNIST':
+            self.in_channels = 1
+        elif args.baseset == 'CIFAR10':
+            self.in_channels = 3
     def forward(self, x):
         out = self.features(x)
         out = out.view(out.size(0), -1)
@@ -25,7 +28,7 @@ class VGG(nn.Module):
 
     def _make_layers(self, cfg):
         layers = []
-        in_channels = 3
+        in_channels = self.in_channels
         for x in cfg:
             if x == 'M':
                 layers += [nn.MaxPool2d(kernel_size=2, stride=2)]
@@ -38,10 +41,10 @@ class VGG(nn.Module):
         return nn.Sequential(*layers)
 
 
-def test():
-    net = VGG('VGG11')
-    x = torch.randn(2,3,32,32)
-    y = net(x)
-    print(y.size())
+# def test():
+#     net = VGG('VGG11')
+#     x = torch.randn(2,3,32,32)
+#     y = net(x)
+#     print(y.size())
 
 # test()

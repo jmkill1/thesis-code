@@ -12,7 +12,7 @@ def get_model(args, device):
     if args.net in ['ResNet','resnet']:
         net = ResNet18()
     elif args.net in ['VGG','vgg']:
-        net = VGG('VGG19')
+        net = VGG('VGG19', args)
     elif args.net == 'GoogLeNet':
         net = GoogLeNet()
     elif args.net in ['DenseNet','densenet']:

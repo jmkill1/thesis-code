@@ -7,7 +7,7 @@ class AlexNet(nn.Module):
     def __init__(self, num_classes=10, init_weights=False):   
         super(AlexNet, self).__init__()
         self.features = nn.Sequential(  #打包
-            nn.Conv2d(3, 32, kernel_size=3, padding=1),  # input[3, 224, 224]  output[48, 55, 55] 自动舍去小数点后
+            nn.Conv2d(1, 32, kernel_size=3, padding=1),  # input[3, 224, 224]  output[48, 55, 55] 自动舍去小数点后
             nn.ReLU(inplace=True), #inplace 可以载入更大模型
             nn.MaxPool2d(kernel_size=2, stride=2),                  # output[48, 27, 27] kernel_num为原论文一半
             nn.Conv2d(32, 64, kernel_size=3, padding=1),           # output[128, 27, 27]
@@ -53,7 +53,7 @@ class AlexNet(nn.Module):
 
 def test():
     net = AlexNet()
-    x = torch.randn(2,3,32,32)
+    x = torch.randn(2,1,32,32)
     y = net(x)
     print(y.size())
 

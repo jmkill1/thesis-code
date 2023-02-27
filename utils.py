@@ -233,13 +233,20 @@ def rand_bbox(size, lam):
     return bbx1, bby1, bbx2, bby2
 
 
-def produce_plot_alt(path, preds, planeloader, images, labels, trainloader, epoch='best', temp=1.0):
+def produce_plot_alt(args, path, preds, planeloader, images, labels, trainloader, epoch='best', temp=1.0):
     from matplotlib import cm
     from matplotlib.colors import LinearSegmentedColormap
     col_map = cm.get_cmap('gist_rainbow')
     cmaplist = [col_map(i) for i in range(col_map.N)]
-    classes = ['AIRPL', 'AUTO', 'BIRD', 'CAT', 'DEER',
-                   'DOG', 'FROG', 'HORSE', 'SHIP', 'TRUCK']
+    if args.baseset == "CIFAR10":
+        classes = ['AIRPL', 'AUTO', 'BIRD', 'CAT', 'DEER',
+                    'DOG', 'FROG', 'HORSE', 'SHIP', 'TRUCK']
+    elif args.baseset == "MNIST":
+        classes = ['1', '2', '3', '4', '5',
+                   '6', '7', '8', '9', '10']
+    elif args.baseset == 'FashionMNIST':    
+        classes = ['t-shirt', 'trouser', 'pullover', 'dress', 'coat',
+                   'sandal', 'shirt', 'sneaker', 'bag', 'ankle boot']
 
     cmaplist = [cmaplist[45],cmaplist[30],cmaplist[170],cmaplist[150],cmaplist[65],cmaplist[245],cmaplist[0],cmaplist[220],cmaplist[180],cmaplist[90]]
     cmaplist[2] = (0.17254901960784313, 0.6274509803921569, 0.17254901960784313, 1.0)
@@ -284,7 +291,7 @@ def produce_plot_alt(path, preds, planeloader, images, labels, trainloader, epoc
     green_patch = mpatches.Patch(color =cmaplist[labels[2]], label=f'{classes[labels[2]]}')
     plt.legend(handles=[red_patch, blue_patch, green_patch], loc='upper center', bbox_to_anchor=(0.5, 1.05),
               ncol=3, fancybox=True, shadow=True)
-    plt.title(f'Epoch: {epoch}')
+    # plt.title(f'Epoch: {epoch}')
     if path is not None:
         img_dir = '/'.join([p for p in (path.split('/'))[:-1]])
         os.makedirs(img_dir, exist_ok=True)
@@ -380,7 +387,7 @@ def produce_plot_x(path, preds, planeloader, images, labels, trainloader, title=
     plt.close(fig)
     return
 
-def produce_plot_sepleg(path, preds, planeloader, images, labels, trainloader, title='best', temp=0.01,true_labels = None):
+def produce_plot_sepleg(args, path, preds, planeloader, images, labels, trainloader, dataset, title='best', temp=0.01,true_labels = None):
     import seaborn as sns
     sns.set_style("whitegrid")
     paper_rc = {'lines.linewidth': 1, 'lines.markersize': 15,}                  
@@ -390,8 +397,15 @@ def produce_plot_sepleg(path, preds, planeloader, images, labels, trainloader, t
     from matplotlib.colors import LinearSegmentedColormap
     col_map = cm.get_cmap('gist_rainbow')
     cmaplist = [col_map(i) for i in range(col_map.N)]
-    classes = ['AIRPL', 'AUTO', 'BIRD', 'CAT', 'DEER',
-                   'DOG', 'FROG', 'HORSE', 'SHIP', 'TRUCK']
+    if args.baseset == "CIFAR10":
+        classes = ['AIRPL', 'AUTO', 'BIRD', 'CAT', 'DEER',
+                    'DOG', 'FROG', 'HORSE', 'SHIP', 'TRUCK']
+    elif args.baseset == "MNIST":
+        classes = ['1', '2', '3', '4', '5',
+                   '6', '7', '8', '9', '10']
+    elif args.baseset == 'FashionMNIST':    
+        classes = ['t-shirt', 'trouser', 'pullover', 'dress', 'coat',
+                   'sandal', 'shirt', 'sneaker', 'bag', 'ankle boot']
     cmaplist = [cmaplist[45],cmaplist[30],cmaplist[170],cmaplist[150],cmaplist[65],cmaplist[245],cmaplist[0],cmaplist[220],cmaplist[180],cmaplist[90]]
     cmaplist[2] = (0.17254901960784313, 0.6274509803921569, 0.17254901960784313, 1.0)
     cmaplist[4] = (0.6509803921568628, 0.33725490196078434, 0.1568627450980392, 1.0)

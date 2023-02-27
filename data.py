@@ -48,9 +48,8 @@ def _baseset_picker(args):
     elif args.baseset == 'MNIST':
         transform=transforms.Compose([
             transforms.Resize(size),
-            transforms.RandomHorizontalFlip(),
             transforms.ToTensor(),
-            transforms.Normalize((0.1307,), (0.3081,))])
+            transforms.Normalize((0.5,), (0.5,))])
         clean_trainset = torchvision.datasets.MNIST(
             root=f'{root_path}/data', train=True, download=True, transform=transform)
         clean_trainloader = torch.utils.data.DataLoader(
