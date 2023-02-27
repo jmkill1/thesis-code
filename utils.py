@@ -242,8 +242,8 @@ def produce_plot_alt(args, path, preds, planeloader, images, labels, trainloader
         classes = ['AIRPL', 'AUTO', 'BIRD', 'CAT', 'DEER',
                     'DOG', 'FROG', 'HORSE', 'SHIP', 'TRUCK']
     elif args.baseset == "MNIST":
-        classes = ['1', '2', '3', '4', '5',
-                   '6', '7', '8', '9', '10']
+        classes = ['0', '1', '2', '3', '4',
+                   '5', '6', '7', '8', '9']
     elif args.baseset == 'FashionMNIST':    
         classes = ['t-shirt', 'trouser', 'pullover', 'dress', 'coat',
                    'sandal', 'shirt', 'sneaker', 'bag', 'ankle boot']
@@ -266,7 +266,7 @@ def produce_plot_alt(args, path, preds, planeloader, images, labels, trainloader
     color_idx = [label_color_dict[label] for label in class_pred]
     scatter = ax1.scatter(x, y, c=color_idx, alpha=val, s=0.1)
     markers = [plt.Line2D([0,0],[0,0],color=color, marker='o', linestyle='') for color in label_color_dict.values()]
-    legend1 = plt.legend(markers, classes, numpoints=1,bbox_to_anchor=(1.01, 1))
+    legend1 = plt.legend(markers, classes, numpoints=1, bbox_to_anchor=(1.01, 1))
     ax1.add_artist(legend1)
     coords = planeloader.dataset.coords
 
@@ -293,10 +293,10 @@ def produce_plot_alt(args, path, preds, planeloader, images, labels, trainloader
               ncol=3, fancybox=True, shadow=True)
     # plt.title(f'Epoch: {epoch}')
     if path is not None:
-        img_dir = '/'.join([p for p in (path.split('/'))[:-1]])
+        img_dir = '/'.join([p for p in (path.split('/'))[:]])
         os.makedirs(img_dir, exist_ok=True)
         #os.makedirs(path.split, exist_ok=True)
-        plt.savefig(f'{path}.png',bbox_extra_artists=(legend1,), bbox_inches='tight')
+        plt.savefig(f'{img_dir}/plot_alt.png',bbox_extra_artists=(legend1,), bbox_inches='tight')
     plt.close(fig)
     return
 
@@ -401,8 +401,8 @@ def produce_plot_sepleg(args, path, preds, planeloader, images, labels, trainloa
         classes = ['AIRPL', 'AUTO', 'BIRD', 'CAT', 'DEER',
                     'DOG', 'FROG', 'HORSE', 'SHIP', 'TRUCK']
     elif args.baseset == "MNIST":
-        classes = ['1', '2', '3', '4', '5',
-                   '6', '7', '8', '9', '10']
+        classes = ['0', '1', '2', '3', '4',
+                   '5', '6', '7', '8', '9']
     elif args.baseset == 'FashionMNIST':    
         classes = ['t-shirt', 'trouser', 'pullover', 'dress', 'coat',
                    'sandal', 'shirt', 'sneaker', 'bag', 'ankle boot']
@@ -457,9 +457,9 @@ def produce_plot_sepleg(args, path, preds, planeloader, images, labels, trainloa
 
     plt.margins(0,0)
     if path is not None:
-        img_dir = '/'.join([p for p in (path.split('/'))[:-1]])
+        img_dir = '/'.join([p for p in (path.split('/'))[:]])
         os.makedirs(img_dir, exist_ok=True)
-        plt.savefig(f'{path}_x.png', bbox_inches='tight')
+        plt.savefig(f'{img_dir}/plot_sepleg.png', bbox_inches='tight')
 
 
     plt.close(fig)

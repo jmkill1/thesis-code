@@ -12,7 +12,7 @@ python main.py --net MobileNet --baseset CIFAR10 --imgs 30,72,42 --resolution 50
 
 
 #可视化MNIST决策边界
-python db_vis.py --net LeNet --load_net ../ckp/MNIST/LeNet.pth --baseset MNIST --imgs 30,72,42 --resolution 500 --range_l 0.5 --range_r 0.5
+python db_vis.py --net LeNet --baseset MNIST --load_net ../ckp/MNIST/LeNet98.92.pth --imgs 10,20,30 --resolution 500 --range_l 0.5 --range_r 0.5 --num_workers 0
 #可视化FashionMNIST决策边界
 python db_vis.py --net AlexNet --load_net ../ckp/FashionMNIST/AlexNet.pth --baseset FashionMNIST --imgs 30,72,42 --resolution 500 --range_l 0.5 --range_r 0.5
 python db_vis.py --net VGG --load_net ../ckp/FashionMNIST/VGG.pth --baseset FashionMNIST --imgs 30,72,42 --resolution 500 --range_l 0.5 --range_r 0.5

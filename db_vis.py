@@ -51,7 +51,7 @@ from utils import produce_plot_alt,produce_plot_sepleg
 net_name = args.net
 plot_path = f'{root_path}/images/{net_name}/{str(args.baseset)}/{sampleids}'
 os.makedirs(plot_path, exist_ok=True)
-produce_plot_sepleg(args, plot_path, preds, planeloader, images, labels, trainloader, title = 'best', temp=1.0,true_labels = None)
+produce_plot_sepleg(args, plot_path, preds, planeloader, images, labels, trainloader, title = 'best', temp=1.0,true_labels = labels)
 produce_plot_alt(args, plot_path, preds, planeloader, images, labels, trainloader)
 
 end = time.time()

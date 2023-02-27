@@ -128,5 +128,5 @@ def make_planeloader(images, args):
     planeset = plane_dataset(images[0], a, b_orthog, coords, resolution=args.resolution, range_l=args.range_l, range_r=args.range_r)
 
     planeloader = torch.utils.data.DataLoader(
-        planeset, batch_size=256, shuffle=False, num_workers=2)
+        planeset, batch_size=256, shuffle=False, num_workers=args.num_workers)
     return planeloader
