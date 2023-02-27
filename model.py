@@ -21,6 +21,8 @@ def get_model(args, device):
         net = MobileNetV2()
     elif args.net == 'LeNet':
         net = LeNet()
+    elif args.net == 'AlexNet':
+        net = AlexNet()
     if device == 'cuda' and torch.cuda.device_count() > 1:
         net = torch.nn.DataParallel(net)
         cudnn.benchmark = True

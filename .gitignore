@@ -1,0 +1,8 @@
+# Compiled class file
+__pycache__
+
+# wandb Log file
+*.log
+wandb/
+
+

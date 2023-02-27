@@ -13,10 +13,10 @@ import copy
 
 def train(args, net, trainloader, optimizer, criterion, device, mode, sam_radius=False):
     if mode == "naive":
-        acc = eval(f"train_{mode}")(args, net, trainloader, optimizer, criterion, device, sam_radius=False)
+        acc, train_loss = eval(f"train_{mode}")(args, net, trainloader, optimizer, criterion, device, sam_radius=False)
     else:
-        acc = eval(f"train_{mode}")(args, net, trainloader, optimizer, criterion, device)
-    return acc
+        acc, train_loss = eval(f"train_{mode}")(args, net, trainloader, optimizer, criterion, device)
+    return acc, train_loss
 
 def train_naive(args, net, trainloader, optimizer, criterion, device, sam_radius=False):
     net.train()
@@ -52,7 +52,7 @@ def train_naive(args, net, trainloader, optimizer, criterion, device, sam_radius
         correct += predicted.eq(targets).sum().item()
         if args.dryrun:
             break
-    return 100.*correct/total
+    return 100.*correct/total, train_loss
 
 def train_mixup(args, net, trainloader, optimizer, criterion, device):
     net.train()
@@ -77,7 +77,7 @@ def train_mixup(args, net, trainloader, optimizer, criterion, device):
         correct += predicted.eq(targets).sum().item()
         if args.dryrun:
             break
-    return 100. * correct / total
+    return 100. * correct / total, train_loss
 
 def train_cutmix(args, net, trainloader, optimizer, criterion, device):
     net.train()
@@ -124,7 +124,7 @@ def train_cutmix(args, net, trainloader, optimizer, criterion, device):
         correct += predicted.eq(targets).sum().item()
         if args.dryrun:
             break
-    return 100. * correct / total
+    return 100. * correct / total, train_loss
 
 
 
@@ -156,7 +156,7 @@ def train_hard_distillation(args, net, trainloader, optimizer, criterion, device
         correct += predicted.eq(targets).sum().item()
         if args.dryrun:
             break
-    return 100. * correct / total
+    return 100. * correct / total, train_loss
 
 def train_og_distillation(args, student, teacher, trainloader, optimizer, criterion, device):
     #teacher = copy.deepcopy(net)
@@ -184,7 +184,7 @@ def train_og_distillation(args, student, teacher, trainloader, optimizer, criter
         correct += predicted.eq(targets).sum().item()
         if args.dryrun:
             break
-    return 100. * correct / total
+    return 100. * correct / total, train_loss
 
 def train_adv(args, net, trainloader, optimizer, criterion, device):
     net.train()
@@ -222,7 +222,7 @@ def train_adv(args, net, trainloader, optimizer, criterion, device):
 
         if args.dryrun:
             break
-    return 100.*correct/total
+    return 100.*correct/total, train_loss
 
 def train_adv_mix(args, net, trainloader, optimizer, criterion, device):
     net.train()
@@ -261,7 +261,7 @@ def train_adv_mix(args, net, trainloader, optimizer, criterion, device):
 
         if args.dryrun:
             break
-    return 100.*correct/total
+    return 100.*correct/total, train_loss
 
 def test(args, net, testloader, device, epoch,images=None,labels=None,planeloader=None):
     net.eval()

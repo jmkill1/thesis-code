@@ -18,7 +18,7 @@ from utils import simple_lapsed_time
 
 args = options().parse_args()
 print(args)
-
+root_path = 'content/drive/MyDrive'
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 save_path = args.save_net
 if args.active_log:
@@ -31,6 +31,7 @@ if args.active_log:
 torch.manual_seed(args.set_data_seed)
 trainloader, testloader = get_data(args)
 torch.manual_seed(args.set_seed)
+train_loss = []
 test_accs = []
 train_accs = []
 net = get_model(args, device)
@@ -59,11 +60,11 @@ if args.load_net is None:
     if args.plot_animation:
         image_ids = args.imgs
         sampleids = '_'.join(list(map(str,image_ids)))
-        os.makedirs(f'images/{args.net}/{args.train_mode}/{sampleids}/{str(args.set_seed)}', exist_ok=True)
-        args.plot_path = os.path.join('images', args.net, args.train_mode, sampleids,str(args.set_seed))
+        os.makedirs(f'{root_path}/images/{args.net}/{args.train_mode}/{sampleids}/{str(args.set_seed)}', exist_ok=True)
+        args.plot_path = os.path.join(root_path, 'images', args.net, args.train_mode, sampleids,str(args.set_seed))
         if args.extra_path != None:
-            os.makedirs(f'images/{args.net}/{args.train_mode}/{sampleids}/{args.extra_path}/{str(args.set_seed)}', exist_ok=True)
-            args.plot_path = os.path.join('images', args.net, args.train_mode, sampleids, args.extra_path, str(args.set_seed))
+            os.makedirs(f'{root_path}/images/{args.net}/{args.train_mode}/{sampleids}/{args.extra_path}/{str(args.set_seed)}', exist_ok=True)
+            args.plot_path = os.path.join(root_path, 'images', args.net, args.train_mode, sampleids, args.extra_path, str(args.set_seed))
 
         if args.imgs is None:
             #images, labels = get_random_images(trainloader.dataset)
@@ -101,15 +102,15 @@ if args.load_net is None:
         planeloader = make_planeloader(images, args)
         print(len(planeloader))
     for epoch in range(args.epochs):
-        train_acc = train(args, net, trainloader, optimizer, criterion, device, args.train_mode, sam_radius=args.sam_radius)
+        train_acc, train_loss = train(args, net, trainloader, optimizer, criterion, device, args.train_mode, sam_radius=args.sam_radius)
         if args.plot_animation:
             test_acc, predicted = test(args, net, testloader, device, epoch,images,labels,planeloader)
         else:
             test_acc, predicted = test(args, net, testloader, device, epoch)
-        print(f'EPOCH:{epoch}, Test acc: {test_acc}')
+        print(f'EPOCH:{epoch}, Test acc: {test_acc}, Train_acc: {train_acc}, Train_loss: {train_loss}')
         if args.active_log:
-            wandb.log({'epoch': epoch ,'test_accuracy': test_acc
-            })
+            wandb.log({'epoch': epoch ,'test_accuracy': test_acc,
+                       'train_acc': train_acc, 'train_loss': train_loss})
         if args.dryrun:
             break
         if args.opt == 'SGD':
@@ -118,31 +119,17 @@ if args.load_net is None:
         # Save checkpoint.
         if test_acc > best_acc:
             print(f'The best epoch is: {epoch}')
-            os.makedirs(f'saved_models/{args.train_mode}/{str(args.set_seed)}', exist_ok=True)
-            if args.extra_path != None:
-                os.makedirs(save_path, exist_ok=True)
-                print(f'{save_path}/{args.save_net}.pth')
-                if torch.cuda.device_count() > 1:
-                    state_dict = net.module.state_dict()
-                else:
-                    state_dict = net.state_dict()
-                torch.save(state_dict, f'{save_path}/{args.save_net}.pth')
-                
+            os.makedirs(f'{root_path}/ckp/{args.baseset}', exist_ok=True)
+            
+            print(f'{root_path}/ckp/{args.baseset}/{str(args.net)}.pth')
+            if torch.cuda.device_count() > 1:
+                torch.save(net.module.state_dict(),
+                            f'{root_path}/ckp/{args.baseset}/{str(args.net)}.pth')
             else:
-                print(f'saved_models/{args.train_mode}/{str(args.set_seed)}/{args.save_net}.pth')
-                if torch.cuda.device_count() > 1:
-                    torch.save(net.module.state_dict(),
-                               f'saved_models/{args.train_mode}/{str(args.set_seed)}/{args.save_net}.pth')
-                else:
-                    torch.save(net.state_dict(),
-                               f'saved_models/{args.train_mode}/{str(args.set_seed)}/{args.save_net}.pth')
+                torch.save(net.state_dict(),
+                            f'{root_path}/ckp/{args.baseset}/{str(args.net)}.pth')
             best_acc = test_acc
             best_epoch = epoch
-
-        if args.train_mode == 'adv' and epoch % 5 == 0:
-            adv_acc, predicted = test_on_adv(args, net, testloader, device)
-            print(f'EPOCH:{epoch}, Adv acc: {adv_acc}')
-
 else:
     net.load_state_dict(torch.load(args.load_net))
     
@@ -152,6 +139,7 @@ if args.load_net is None and args.active_log:
                     })
 # test_acc, predicted = test(args, net, testloader, device)
 # print(test_acc)
+
 end = time.time()
 simple_lapsed_time("Time taken to train/load the model", end-start)
 
@@ -186,7 +174,7 @@ if not args.plot_animation:
             transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
         ])
         temp_trainset = torchvision.datasets.MNIST(
-            root='~/data', train=True, download=True, transform=transform_train)
+            root=f'{root_path}/data', train=True, download=True, transform=transform_train)
         trainloader_2 = torch.utils.data.DataLoader(
             temp_trainset, batch_size=128, shuffle=False, num_workers=2)
         # import ipdb; ipdb.set_trace()
@@ -284,15 +272,10 @@ if not args.plot_animation:
     from utils import produce_plot_alt,produce_plot_x,produce_plot_sepleg
 
     net_name = args.net
-    if args.net == 'WideResNet':
-        net_name = f'WideResNet_{args.widen_factor}'
-    os.makedirs(f'images/{net_name}/{args.train_mode}/{sampleids}/{str(args.set_seed)}', exist_ok=True)
-    # plot_path = os.path.join('images', args.net, args.train_mode, sampleids,str(args.set_seed),'best')
-    # args.plot_path = os.path.join('./images', args.net, args.train_mode, sampleids, args.extra_path)
-    # plot_path = os.path.join(args.plot_path,sampleids,f'{net_name}_{args.set_seed}cifar10')
-    # os.makedirs(f'{args.plot_path}/{sampleids}', exist_ok=True)
-    plot_path = os.path.join(args.plot_path,f'{net_name}_{sampleids}_{args.set_seed}cifar10')
-    os.makedirs(f'{args.plot_path}', exist_ok=True)
+    os.makedirs(f'{root_path}/images/{net_name}/{sampleids}/{str(args.set_seed)/args.baseset}', exist_ok=True)
+
+    plot_path = f'{root_path}/images/{net_name}/{sampleids}/{str(args.set_seed)/args.baseset}'
+    os.makedirs(plot_path, exist_ok=True)
     produce_plot_sepleg(plot_path, preds, planeloader, images, labels, trainloader, title = 'best', temp=1.0,true_labels = None)
     produce_plot_alt(plot_path, preds, planeloader, images, labels, trainloader)
 

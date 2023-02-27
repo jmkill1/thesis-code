@@ -22,6 +22,7 @@ def options():
     parser.add_argument('--sam_radius', type=float)
     parser.add_argument('--dryrun', action='store_true')
     parser.add_argument('--bs', default=128 , type=int)
+    parser.add_argument('--num_workers', default=2, type=int)
 
     # Changes to training?
     parser.add_argument('--cutmix_beta', default=1.0, type=float, help='hyperparameter beta for cutmix')
@@ -61,4 +62,4 @@ def options():
     parser.add_argument('--model_path_2', type=str, default=None)
     parser.add_argument('--save_epoch',  nargs="+", type=int, default=None)
 
-    return 
+    return parser
