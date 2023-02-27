@@ -1,9 +1,6 @@
 import torchvision
 import torchvision.transforms as transforms
 import torch
-import random
-import os
-from PIL import Image
 
 
 def _baseset_picker(args):

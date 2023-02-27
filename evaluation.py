@@ -6,7 +6,7 @@ from data import make_planeloader
 from utils import produce_plot_alt, mixup_data, rand_bbox, AttackPGD
 from torch.autograd import Variable
 import copy
-from model import get_teacher_model
+
 
 
 # Training
@@ -126,36 +126,7 @@ def train_cutmix(args, net, trainloader, optimizer, criterion, device):
             break
     return 100. * correct / total
 
-def train_soft_distillation(args, net, trainloader, optimizer, criterion, device):
 
-    teacher = get_teacher_model(args, device)
-    if torch.cuda.device_count() > 1:
-        teacher.module.load_state_dict(torch.load(args.teacher_loc))
-    else:
-        teacher.load_state_dict(torch.load(args.teacher_loc))
-
-    teacher.eval()
-
-    net.train()
-    train_loss = 0
-    correct = 0
-    total = 0
-    for batch_idx, (inputs, targets) in enumerate(trainloader):
-        inputs, targets = inputs.to(device), targets.to(device)
-        optimizer.zero_grad()
-        teacher_labels = teacher(inputs)
-        outputs = net(inputs)
-        loss = criterion(outputs, teacher_labels) #make sure l2 loss
-        loss.backward()
-        optimizer.step()
-
-        train_loss += loss.item()
-        _, predicted = outputs.max(1)
-        total += targets.size(0)
-        correct += predicted.eq(targets).sum().item()
-        if args.dryrun:
-            break
-    return 100. * correct / total
 
 def train_hard_distillation(args, net, trainloader, optimizer, criterion, device):
 
