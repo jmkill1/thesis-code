@@ -59,10 +59,7 @@ best_epoch = 0
 if args.load_net is None:
     for epoch in range(args.epochs):
         train_acc, train_loss = train(args, net, trainloader, optimizer, criterion, device, args.train_mode, sam_radius=args.sam_radius)
-        if args.plot_animation:
-            test_acc, predicted = test(args, net, testloader, device, epoch,images,labels,planeloader)
-        else:
-            test_acc, predicted = test(args, net, testloader, device, epoch)
+        test_acc, predicted = test(args, net, testloader, device, epoch)
         print(f'EPOCH:{epoch}, Test acc: {test_acc}, Train_acc: {train_acc}, Train_loss: {train_loss}')
         if args.active_log:
             wandb.log({'epoch': epoch ,'test_accuracy': test_acc,

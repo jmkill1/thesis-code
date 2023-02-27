@@ -29,7 +29,7 @@ torch.manual_seed(args.set_seed)
 net = get_model(args, device)
 
 # Load model
-net.load_state_dict(torch.load(args.load_net))
+net.load_state_dict(torch.load(args.load_net, map_location=torch.device(device)))
     
 start = time.time()
 if args.imgs is None:

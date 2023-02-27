@@ -387,7 +387,7 @@ def produce_plot_x(path, preds, planeloader, images, labels, trainloader, title=
     plt.close(fig)
     return
 
-def produce_plot_sepleg(args, path, preds, planeloader, images, labels, trainloader, dataset, title='best', temp=0.01,true_labels = None):
+def produce_plot_sepleg(args, path, preds, planeloader, images, labels, trainloader, title='best', temp=0.01,true_labels = None):
     import seaborn as sns
     sns.set_style("whitegrid")
     paper_rc = {'lines.linewidth': 1, 'lines.markersize': 15,}                  
