@@ -272,9 +272,9 @@ if not args.plot_animation:
     from utils import produce_plot_alt,produce_plot_x,produce_plot_sepleg
 
     net_name = args.net
-    os.makedirs(f'{root_path}/images/{net_name}/{sampleids}/{str(args.set_seed)/args.baseset}', exist_ok=True)
+    os.makedirs(f'{root_path}/images/{net_name}/{sampleids}/{str(args.set_seed)/str(args.baseset)}', exist_ok=True)
 
-    plot_path = f'{root_path}/images/{net_name}/{sampleids}/{str(args.set_seed)/args.baseset}'
+    plot_path = f'{root_path}/images/{net_name}/{sampleids}/{str(args.set_seed)/str(args.baseset)}'
     os.makedirs(plot_path, exist_ok=True)
     produce_plot_sepleg(plot_path, preds, planeloader, images, labels, trainloader, title = 'best', temp=1.0,true_labels = None)
     produce_plot_alt(plot_path, preds, planeloader, images, labels, trainloader)

@@ -2,7 +2,7 @@ import torchvision
 import torchvision.transforms as transforms
 import torch
 
-
+root_path = 'content/drive/MyDrive'
 def _baseset_picker(args):
     size = 32
     if args.baseset == 'CIFAR10':
@@ -22,12 +22,12 @@ def _baseset_picker(args):
             ])
         
         clean_trainset = torchvision.datasets.CIFAR10(
-            root='~/data', train=True, download=True, transform=transform_train)
+            root=f'{root_path}/data', train=True, download=True, transform=transform_train)
         clean_trainloader = torch.utils.data.DataLoader(
             clean_trainset, batch_size=args.bs, shuffle=False, num_workers=args.num_workers)
         
         testset = torchvision.datasets.CIFAR10(
-            root='content/data', train=False, download=True, transform=transform_test)
+            root=f'{root_path}/data', train=False, download=True, transform=transform_test)
         testloader = torch.utils.data.DataLoader(
             testset, batch_size=args.bs, shuffle=False, num_workers=args.num_workers)
     elif args.baseset == 'FashionMNIST':
@@ -37,12 +37,12 @@ def _baseset_picker(args):
             transforms.ToTensor(),
             transforms.Normalize((0.1307,), (0.3081,))])
         clean_trainset = torchvision.datasets.FashionMNIST(
-            root='~/data', train=True, download=True, transform=transform)
+            root=f'{root_path}/data', train=True, download=True, transform=transform)
         clean_trainloader = torch.utils.data.DataLoader(
             clean_trainset, batch_size=args.bs, shuffle=False, num_workers=args.num_workers)
         
         testset = torchvision.datasets.FashionMNIST(
-            root='~/data', train=False, download=True, transform=transform)
+            root=f'{root_path}/data', train=False, download=True, transform=transform)
         testloader = torch.utils.data.DataLoader(
             testset, batch_size=args.bs, shuffle=False, num_workers=args.num_workers)
     elif args.baseset == 'MNIST':
@@ -52,12 +52,12 @@ def _baseset_picker(args):
             transforms.ToTensor(),
             transforms.Normalize((0.1307,), (0.3081,))])
         clean_trainset = torchvision.datasets.MNIST(
-            root='~/data', train=True, download=True, transform=transform)
+            root=f'{root_path}/data', train=True, download=True, transform=transform)
         clean_trainloader = torch.utils.data.DataLoader(
             clean_trainset, batch_size=args.bs, shuffle=False, num_workers=args.num_workers)
         
         testset = torchvision.datasets.MNIST(
-            root='~/data', train=False, download=True, transform=transform)
+            root=f'{root_path}/data', train=False, download=True, transform=transform)
         testloader = torch.utils.data.DataLoader(
             testset, batch_size=args.bs, shuffle=False, num_workers=args.num_workers)
 
