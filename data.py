@@ -2,7 +2,7 @@ import torchvision
 import torchvision.transforms as transforms
 import torch
 
-root_path = 'content/drive/MyDrive'
+root_path = '../'
 def _baseset_picker(args):
     size = 32
     if args.baseset == 'CIFAR10':

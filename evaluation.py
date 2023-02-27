@@ -52,7 +52,7 @@ def train_naive(args, net, trainloader, optimizer, criterion, device, sam_radius
         correct += predicted.eq(targets).sum().item()
         if args.dryrun:
             break
-    return 100.*correct/total, train_loss
+    return 100.*correct/total, train_loss/total
 
 def train_mixup(args, net, trainloader, optimizer, criterion, device):
     net.train()

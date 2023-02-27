@@ -236,12 +236,15 @@ def rand_bbox(size, lam):
 def produce_plot_alt(path, preds, planeloader, images, labels, trainloader, epoch='best', temp=1.0):
     from matplotlib import cm
     from matplotlib.colors import LinearSegmentedColormap
-    col_map = cm.get_cmap('tab10')
+    col_map = cm.get_cmap('gist_rainbow')
     cmaplist = [col_map(i) for i in range(col_map.N)]
-    classes = ['airpl', 'autom', 'bird', 'cat', 'deer',
-                   'dog', 'frog', 'horse', 'ship', 'truck']
+    classes = ['AIRPL', 'AUTO', 'BIRD', 'CAT', 'DEER',
+                   'DOG', 'FROG', 'HORSE', 'SHIP', 'TRUCK']
 
-    cmaplist = cmaplist[:len(classes)]
+    cmaplist = [cmaplist[45],cmaplist[30],cmaplist[170],cmaplist[150],cmaplist[65],cmaplist[245],cmaplist[0],cmaplist[220],cmaplist[180],cmaplist[90]]
+    cmaplist[2] = (0.17254901960784313, 0.6274509803921569, 0.17254901960784313, 1.0)
+    cmaplist[4] = (0.6509803921568628, 0.33725490196078434, 0.1568627450980392, 1.0)
+    
     col_map = LinearSegmentedColormap.from_list('custom_colormap', cmaplist, N=len(classes))
     fig, ax1 = plt.subplots()
     import torch.nn as nn
@@ -382,7 +385,7 @@ def produce_plot_sepleg(path, preds, planeloader, images, labels, trainloader, t
     sns.set_style("whitegrid")
     paper_rc = {'lines.linewidth': 1, 'lines.markersize': 15,}                  
     sns.set_context("paper", rc = paper_rc,font_scale=1.5)  
-    plt.rc("font", family="Times New Roman")
+    # plt.rc("font", family="Times New Roman")
     from matplotlib import cm
     from matplotlib.colors import LinearSegmentedColormap
     col_map = cm.get_cmap('gist_rainbow')

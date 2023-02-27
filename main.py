@@ -18,13 +18,13 @@ from utils import simple_lapsed_time
 
 args = options().parse_args()
 print(args)
-root_path = 'content/drive/MyDrive'
+root_path = '../'
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 save_path = args.save_net
 if args.active_log:
     import wandb
     idt = '_'.join(list(map(str,args.imgs)))
-    wandb.init(project="decision_boundaries", name = '_'.join([args.net,args.train_mode,idt,'seed'+str(args.set_seed)]) )
+    wandb.init(project="Train_models", name = str(args.net) )
     wandb.config.update(args)
 
 # Data/other training stuff
@@ -148,137 +148,24 @@ if not args.plot_animation:
     if args.imgs is None:
         #images, labels = get_random_images(trainloader.dataset)
         images, labels, image_ids = get_random_images(testloader.dataset)
-    elif -1 in args.imgs:
-        dummy_imgs, _ = get_random_images(testloader.dataset)
-        images, labels = get_noisy_images(torch.stack(dummy_imgs), testloader.dataset, net, device)
-    elif -10 in args.imgs:
-        image_ids = args.imgs[0]
-        images = [testloader.dataset[image_ids][0]]
-        labels = [testloader.dataset[image_ids][1]]
-        for i in list(range(2)):
-            temp = torch.zeros_like(images[0])
-            if i == 0:
-                temp[0,0,0] = 1
-            else:
-                temp[0,-1,-1] = 1
-
-            images.append(temp)
-            labels.append(0)
-
-    elif -100 in args.imgs:
-        torch.manual_seed(args.set_data_seed)
-        transform_train = transforms.Compose([
-            transforms.Grayscale(3),
-            transforms.Resize(32),
-            transforms.ToTensor(),
-            transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
-        ])
-        temp_trainset = torchvision.datasets.MNIST(
-            root=f'{root_path}/data', train=True, download=True, transform=transform_train)
-        trainloader_2 = torch.utils.data.DataLoader(
-            temp_trainset, batch_size=128, shuffle=False, num_workers=2)
-        # import ipdb; ipdb.set_trace()
-        # image_ids = args.imgs[:-1]
-        np.random.seed(args.set_seed)
-        image_ids = np.random.choice(range(50000), 2)
-        images = [trainloader.dataset[i][0] for i in image_ids]
-        labels = [trainloader.dataset[i][1] for i in image_ids]
-        l = np.random.choice(range(60000), 1)[0]
-        images.append(trainloader_2.dataset[l][0])
-        labels.append(trainloader_2.dataset[l][1])
-        print(labels,l)
-
     else:
         # import ipdb; ipdb.set_trace()
         image_ids = args.imgs
         images = [trainloader.dataset[i][0] for i in image_ids]
         labels = [trainloader.dataset[i][1] for i in image_ids]
         print(labels)
-    if args.adv:
-        adv_net = AttackPGD(net, trainloader.dataset)
-        if args.targeted:
-            base_img = images[0]
-            base_label = labels[0]
-            images = [base_img, base_img]
-            labels = [(labels[0] + 1) % 10, (labels[0] + 2) % 10]
-        adv_preds, imgs = adv_net(torch.stack(images).to(device), torch.tensor(labels).to(device), targeted=args.targeted)
-        images = [img.cpu() for img in imgs]
-        if args.targeted:
-            images = [base_img] + images
-            labels = [base_label] + labels
-
-    if args.noise_type:
-        if args.noise_type == 'gaussian':
-            print('In gaussian')
-            base_img = images[0]
-            base_label = labels[0]
-            np.random.seed(0)
-            noise1 = torch.from_numpy(np.float32(np.clip(
-                np.random.normal(size=(3, 32, 32), scale=0.5), -1, 1)))
-            noise2 = torch.from_numpy(np.float32(np.clip(
-                np.random.normal(size=(3, 32, 32), scale=0.25), -0.5, 0.5)))
-            images = [base_img,base_img+noise1, base_img+noise2 ]
-            labels = [base_label,base_label,base_label]
-        elif args.noise_type == 'rotation':
-            base_img = images[0]
-            base_label = labels[0]
-            images = [base_img,torch.rot90(base_img, 1, [1, 2]), torch.rot90(base_img, 2, [1, 2]) ]
-            labels = [base_label,base_label,base_label]
-        elif args.noise_type == 'uniform_random':
-            transform_train = transforms.Compose([
-                    transforms.ToTensor(),
-                    transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
-                    ])
-            from PIL import Image
-            np.random.seed(args.set_seed)
-            im1 = transform_train(Image.fromarray(np.uint8(np.random.uniform(0,1,(32,32,3))*255)))
-            im2 = transform_train(Image.fromarray(np.uint8(np.random.uniform(0,1,(32,32,3))*255)))
-            im3 = transform_train(Image.fromarray(np.uint8(np.random.uniform(0,1,(32,32,3))*255)))
-            # import ipdb; ipdb.set_trace()
-            images = [im1,im2,im3]
-            labels = [0,0,0]
-        elif args.noise_type == 'random_shuffle':
-            import ipdb; ipdb.set_trace()
-            np.random.seed(args.set_seed)
-            image_ids = np.random.choice(range(50000), 3)
-            images = [trainloader.dataset[i][0] for i in image_ids]
-            labels = [trainloader.dataset[i][1] for i in image_ids]
-            print(image_ids,labels)
-            c,h,w = images[0].shape
-            # import ipdb; ipdb.set_trace()
-            shuffle1 = images[0].clone().reshape(c,-1)[:,torch.randperm(h*w)].reshape(c,h,w)
-            shuffle2 = images[1].clone().reshape(c,-1)[:,torch.randperm(h*w)].reshape(c,h,w)
-            shuffle3 = images[2].clone().reshape(c,-1)[:,torch.randperm(h*w)].reshape(c,h,w)
-
-            images = [shuffle1,shuffle2,shuffle3]
-        elif args.noise_type == 'two_random_shuffle':
-            np.random.seed(args.set_seed)
-            image_ids = np.random.choice(range(50000), 3)
-            images = [trainloader.dataset[i][0] for i in image_ids]
-            labels = [trainloader.dataset[i][1] for i in image_ids]
-            print(image_ids,labels)
-            c,h,w = images[0].shape
-            # import ipdb; ipdb.set_trace()
-            shuffle2 = images[1].clone().reshape(c,-1)[:,torch.randperm(h*w)].reshape(c,h,w)
-            shuffle3 = images[2].clone().reshape(c,-1)[:,torch.randperm(h*w)].reshape(c,h,w)
-
-            images = [images[0],shuffle2,shuffle3]
-            # labels = [base_label,base_label,base_label]
     # image_ids = args.imgs
     sampleids = '_'.join(list(map(str,image_ids)))
     # sampleids = '_'.join(list(map(str,labels)))
     planeloader = make_planeloader(images, args)
     preds = decision_boundary(args, net, planeloader, device)
-    from utils import produce_plot_alt,produce_plot_x,produce_plot_sepleg
+    from utils import produce_plot_alt,produce_plot_sepleg
 
     net_name = args.net
-    os.makedirs(f'{root_path}/images/{net_name}/{sampleids}/{str(args.set_seed)/str(args.baseset)}', exist_ok=True)
-
-    plot_path = f'{root_path}/images/{net_name}/{sampleids}/{str(args.set_seed)/str(args.baseset)}'
+    plot_path = f'{root_path}/images/{net_name}/{str(args.baseset)}/{sampleids}'
     os.makedirs(plot_path, exist_ok=True)
     produce_plot_sepleg(plot_path, preds, planeloader, images, labels, trainloader, title = 'best', temp=1.0,true_labels = None)
     produce_plot_alt(plot_path, preds, planeloader, images, labels, trainloader)
 
-    # produce_plot_x(plot_path, preds, planeloader, images, labels, trainloader, title=title, temp=1.0,true_labels = None)
     end = time.time()
     simple_lapsed_time("Time taken to plot the image", end-start)

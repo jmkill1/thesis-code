@@ -12,8 +12,7 @@ def options():
     parser.add_argument('--scheduler', type=str, default='linear')
     parser.add_argument('--net', default='ResNet', type=str)
     parser.add_argument('--baseset', default='CIFAR10', type=str,
-                            choices=['CIFAR10', 'CIFAR100','SVHN',
-                            'CIFAR100_label_noise', 'CIFAR_load'])
+                            choices=['CIFAR10','MNIST','FashionMNIST'])
     parser.add_argument('--load_net', type=str, default=None)
     parser.add_argument('--load_data', type=str, default=None)
     parser.add_argument('--save_net', type=str, default=None)
