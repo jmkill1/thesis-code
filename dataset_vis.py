@@ -7,9 +7,9 @@ import matplotlib.pyplot as plt
 
 
 root_path = '../'
-bs = 32
+bs = 64
 num_workers = 0
-baseset = 'MNIST'
+basesets = ['FashionMNIST', "MNIST", "CIFAR10"]
 def _baseset_picker(baseset):
     size = 32
     if baseset == 'CIFAR10':
@@ -69,17 +69,17 @@ def _baseset_picker(baseset):
 
     return clean_trainloader, testloader, clean_trainset, testset
 
-clean_trainloader, testloader, clean_trainset, testset = _baseset_picker(baseset)
-data, targets = clean_trainset._load_data()
-images, label = next(iter(clean_trainloader))
-images_example = torchvision.utils.make_grid(images)
-images_example = images_example.numpy().transpose(1,2,0)
-mean = [0.5, 0.5, 0.5]
-std = [0.5, 0.5, 0.5]
-images_example = images_example * std + mean
-plt.imshow(images_example)
-plt.xticks([])
-plt.yticks([])
-plt.savefig(f'./{baseset}.png')
+for baseset in basesets:
+    clean_trainloader, testloader, clean_trainset, testset = _baseset_picker(baseset)
+    images, label = next(iter(clean_trainloader))
+    images_example = torchvision.utils.make_grid(images)
+    images_example = images_example.numpy().transpose(1,2,0)
+    mean = [0.5, 0.5, 0.5]
+    std = [0.5, 0.5, 0.5]
+    images_example = images_example * std + mean
+    plt.imshow(images_example)
+    plt.xticks([])
+    plt.yticks([])
+    plt.savefig(f'./{baseset}.png')
 
 
